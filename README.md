@@ -361,4 +361,3 @@ curl -X POST http://localhost:8000/api/move \
 
 - GeeksforGeeks, *Adversarial Search Algorithms in Artificial Intelligence*: https://www.geeksforgeeks.org/artificial-intelligence/adversarial-search-algorithms/
 - Russell, S. & Norvig, P., *Artificial Intelligence: A Modern Approach* (bab Adversarial Search and Games).
-- Dokumentasi Python Runtime Vercel: https://vercel.com/docs/functions/runtimes/python
