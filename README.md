@@ -333,23 +333,6 @@ curl -X POST http://localhost:8000/api/move \
 
 ---
 
-## Deploy ke Vercel
-
-Vercel tidak menjalankan server yang hidup terus, sehingga backend dipecah menjadi fungsi serverless di folder `api/`. `local_server.py` tidak dipakai di Vercel.
-
-1. Pastikan struktur proyek sesuai bagian [Struktur Proyek](#struktur-proyek). `index.html` berada di `public/`.
-2. Tambahkan `.gitignore` berisi `__pycache__/`.
-3. Push proyek ke GitHub.
-4. Di Vercel pilih **Add New → Project**, impor repo, biarkan Framework Preset di **Other**, lalu **Deploy**. Tidak perlu `requirements.txt` karena tidak ada dependensi tambahan.
-
-Hal yang perlu diperhatikan:
-
-- Jangan menamai file Python di root dengan `server.py`, `app.py`, `main.py`, atau `index.py`, karena Vercel mencarinya sebagai entrypoint. Itulah alasan server lokal dinamai `local_server.py`.
-- Perbandingan pada papan kosong menjalankan Minimax dan Expectimax penuh dan bisa melewati batas waktu fungsi. Jika timeout, coba pada papan yang sudah terisi atau naikkan `maxDuration` lewat `vercel.json` sesuai batas paket Anda.
-- Angka waktu di Vercel akan berbeda dari di komputer lokal, dan bisa lebih lambat saat fungsi baru "bangun" (cold start). Untuk laporan, jumlah node lebih dapat diandalkan.
-
----
-
 ## Menambah Algoritma Baru
 
 1. Buat file `algorithms/nama_algoritma.py` dengan fungsi:
