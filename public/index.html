@@ -1,94 +1,137 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Adversarial Search: Tic-Tac-Toe</title>
-    <link rel="preconnect"
-        href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
-    :root {
-        --bg: #E6ECF1;
-        --paper: #FBFCFD;
-        --ink: #17233B;
-        --mute: #5B6880;
-        --line: #C9D3DD;
-        --x: #C8344B;
-        --o: #0B7A8A;
-        --hi: #F2B544
-    }
+      :root {
+        --bg: #e6ecf1;
+        --paper: #fbfcfd;
+        --ink: #17233b;
+        --mute: #5b6880;
+        --line: #c9d3dd;
+        --x: #c8344b;
+        --o: #0b7a8a;
+        --hi: #f2b544;
+      }
 
-    * {
-        box-sizing: border-box
-    }
+      * {
+        box-sizing: border-box;
+      }
 
-    body {
+      body {
         margin: 0;
         font-family: "Bricolage Grotesque", system-ui, sans-serif;
         color: var(--ink);
         background-color: var(--bg);
-        background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
-        background-size: 28px 28px
-    }
+        background-image:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 28px 28px;
+        min-height: 100vh;
+      }
 
-    .wrap {
-        max-width: 1120px;
+      .wrap {
+        max-width: 1180px;
         margin: 0 auto;
-        padding: 32px 20px 56px
-    }
+        padding: 32px 20px 56px;
+      }
 
-    h1 {
+      h1 {
         font-size: clamp(28px, 4vw, 44px);
         font-weight: 800;
-        letter-spacing: -.02em;
-        margin: 0 0 4px
-    }
+        letter-spacing: -0.02em;
+        margin: 0 0 4px;
+      }
 
-    .sub {
+      .sub {
         color: var(--mute);
         margin: 0 0 24px;
-        max-width: 60ch
-    }
+        max-width: 75ch;
+      }
 
-    .grid {
+      /* Navigation */
+
+      .nav {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        border-bottom: 2px solid var(--ink);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      .tab {
+        background: var(--paper);
+        color: var(--ink);
+        border: 2px solid var(--ink);
+        padding: 8px 13px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .tab.active {
+        background: var(--ink);
+        color: #fff;
+      }
+
+      .page {
+        display: none;
+      }
+
+      .page.active {
+        display: block;
+      }
+
+      /* Layout */
+
+      .grid {
         display: grid;
         grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
         gap: 20px;
-        align-items: start
-    }
+        align-items: start;
+      }
 
-    @media(max-width:860px) {
-        .grid {
-            grid-template-columns: 1fr
-        }
-    }
-
-    .card {
+      .card {
         background: var(--paper);
         border: 2px solid var(--ink);
         padding: 18px;
-        margin-bottom: 20px
-    }
+        margin-bottom: 20px;
+      }
 
-    h2 {
+      h2 {
         font-size: 18px;
         margin: 0 0 12px;
-        font-weight: 600
-    }
+        font-weight: 600;
+      }
 
-    .board {
+      .muted {
+        color: var(--mute);
+        font-size: 14px;
+        margin: 0;
+        line-height: 1.45;
+      }
+
+      /* Board */
+
+      .board {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         width: 100%;
         aspect-ratio: 1;
-        margin-bottom: 12px
-    }
+        margin-bottom: 12px;
+      }
 
-    .cell {
+      .cell {
         position: relative;
         border: 0;
         background: transparent;
@@ -97,315 +140,839 @@
         line-height: 1;
         font-family: inherit;
         cursor: pointer;
-        padding: 0
-    }
+        padding: 0;
+        min-width: 0;
+      }
 
-    .cell:nth-child(-n+6) {
-        border-bottom: 6px solid var(--ink)
-    }
+      .cell:nth-child(-n + 6) {
+        border-bottom: 6px solid var(--ink);
+      }
 
-    .cell:not(:nth-child(3n)) {
-        border-right: 6px solid var(--ink)
-    }
+      .cell:not(:nth-child(3n)) {
+        border-right: 6px solid var(--ink);
+      }
 
-    .cell.X {
-        color: var(--x)
-    }
+      .cell.X {
+        color: var(--x);
+      }
 
-    .cell.O {
-        color: var(--o)
-    }
+      .cell.O {
+        color: var(--o);
+      }
 
-    .cell:not(:disabled):hover {
-        background: rgba(23, 35, 59, .07)
-    }
+      .cell:not(:disabled):hover {
+        background: rgba(23, 35, 59, 0.07);
+      }
 
-    .cell:disabled {
-        cursor: default
-    }
+      .cell:disabled {
+        cursor: default;
+      }
 
-    .cell.pick {
-        background: rgba(242, 181, 68, .45)
-    }
+      .cell.pick {
+        background: rgba(242, 181, 68, 0.45);
+      }
 
-    .cell.win {
-        background: var(--hi)
-    }
+      .cell.win {
+        background: var(--hi);
+      }
 
-    .cell:focus-visible,
-    button:focus-visible,
-    input:focus-visible,
-    select:focus-visible,
-    textarea:focus-visible {
+      .cell:focus-visible,
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible {
         outline: 3px solid var(--ink);
-        outline-offset: 2px
-    }
+        outline-offset: 2px;
+      }
 
-    .sc {
+      .sc {
         position: absolute;
         top: 6px;
         left: 8px;
         font-size: 14px;
-        font-family: inherit;
         font-weight: 600;
         line-height: 1;
         color: var(--ink);
-        font-variant-numeric: tabular-nums
-    }
+        font-variant-numeric: tabular-nums;
+      }
 
-    #status {
+      #status {
         font-weight: 600;
         min-height: 1.4em;
-        margin: 0 0 12px
-    }
+        margin: 0 0 12px;
+      }
 
-    .algo {
+      /* Algorithm selection */
+
+      .algo {
         display: grid;
-        gap: 8px
-    }
+        gap: 8px;
+      }
 
-    .algo label {
+      .algo label {
         display: block;
         border: 2px solid var(--line);
         padding: 8px 10px;
-        cursor: pointer
-    }
+        cursor: pointer;
+      }
 
-    .algo label:has(input:checked) {
+      .algo label:has(input:checked) {
         border-color: var(--ink);
-        background: #EEF2F6
-    }
+        background: #eef2f6;
+      }
 
-    .algo b {
-        display: block
-    }
+      .algo b {
+        display: block;
+      }
 
-    .algo span {
+      .algo span {
         color: var(--mute);
-        font-size: 14px
-    }
+        font-size: 14px;
+      }
 
-    .row {
+      .algo input {
+        width: auto;
+        margin-right: 6px;
+        accent-color: var(--o);
+      }
+
+      /* Form and buttons */
+
+      .row {
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
-        margin-top: 12px
-    }
+        margin-top: 12px;
+      }
 
-    .row label {
+      .row label {
         display: grid;
         gap: 4px;
         font-size: 14px;
         color: var(--mute);
         flex: 1;
-        min-width: 120px
-    }
+        min-width: 120px;
+      }
 
-    input,
-    select,
-    textarea,
-    button {
+      input,
+      select,
+      textarea,
+      button {
         font: inherit;
-        color: var(--ink)
-    }
+        color: var(--ink);
+      }
 
-    input,
-    select,
-    textarea {
+      input,
+      select,
+      textarea {
         border: 2px solid var(--ink);
         background: #fff;
         padding: 6px 8px;
-        width: 100%
-    }
+        width: 100%;
+      }
 
-    textarea {
+      textarea {
         font-family: ui-monospace, Menlo, Consolas, monospace;
         font-size: 14px;
         height: 84px;
-        resize: vertical
-    }
+        resize: vertical;
+      }
 
-    .btn {
+      .btn {
         background: var(--ink);
         color: #fff;
         border: 2px solid var(--ink);
         padding: 8px 14px;
         font-weight: 600;
-        cursor: pointer
-    }
+        cursor: pointer;
+      }
 
-    .btn.alt {
+      .btn.alt {
         background: var(--paper);
-        color: var(--ink)
-    }
+        color: var(--ink);
+      }
 
-    .btn:disabled {
-        opacity: .5;
-        cursor: wait
-    }
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
 
-    #stats {
+      .controls {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      .field-note {
+        font-size: 12px;
+        color: var(--mute);
+        margin: 5px 0 0;
+      }
+
+      .disabled-field {
+        opacity: 0.45;
+      }
+
+      /* Original AI analysis */
+
+      #stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 10px
-    }
+        gap: 10px;
+      }
 
-    #stats div {
+      #stats div {
         border-left: 4px solid var(--hi);
-        padding-left: 10px
-    }
+        padding-left: 10px;
+      }
 
-    #stats b {
+      #stats b {
         display: block;
         font-size: 20px;
-        font-variant-numeric: tabular-nums
-    }
+        font-variant-numeric: tabular-nums;
+      }
 
-    #stats span {
+      #stats span {
         font-size: 13px;
-        color: var(--mute)
-    }
-
-    .muted {
         color: var(--mute);
-        font-size: 14px;
-        margin: 0
-    }
+      }
 
-    #err {
+      #err {
         color: var(--x);
         font-size: 14px;
         min-height: 1.2em;
-        margin: 6px 0 0
-    }
+        margin: 6px 0 0;
+      }
 
-    table {
+      /* Original comparison table */
+
+      table {
         width: 100%;
         border-collapse: collapse;
         font-size: 14px;
-        font-variant-numeric: tabular-nums
-    }
+        font-variant-numeric: tabular-nums;
+      }
 
-    th,
-    td {
+      th,
+      td {
         text-align: left;
         padding: 8px 6px;
-        border-bottom: 1px solid var(--line)
-    }
+        border-bottom: 1px solid var(--line);
+      }
 
-    td.bar {
+      td.bar {
         position: relative;
-        min-width: 110px
-    }
+        min-width: 110px;
+      }
 
-    td.bar i {
+      td.bar i {
         position: absolute;
         left: 0;
         bottom: 2px;
         height: 4px;
-        background: var(--o)
-    }
+        background: var(--o);
+      }
 
-    @media(prefers-reduced-motion:no-preference) {
-        .cell {
-            transition: background .15s
+      /* Replay and move log */
+
+      .replay-range {
+        width: 100%;
+        accent-color: var(--o);
+      }
+
+      .replay-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-top: 7px;
+      }
+
+      .move-log {
+        display: grid;
+        gap: 7px;
+        max-height: 240px;
+        overflow: auto;
+      }
+
+      .move-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 7px 9px;
+        background: #f1f4f7;
+        border: 1px solid var(--line);
+        font-size: 14px;
+      }
+
+      .move-item small {
+        color: var(--mute);
+      }
+
+      .pill {
+        display: inline-block;
+        border: 1px solid var(--line);
+        padding: 2px 6px;
+        font-size: 11px;
+        color: var(--mute);
+      }
+
+      .empty {
+        padding: 22px;
+        text-align: center;
+        color: var(--mute);
+        border: 1px dashed var(--line);
+      }
+
+      /* Game history */
+
+      .history-list {
+        display: grid;
+        gap: 9px;
+      }
+
+      .history-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 11px;
+        background: #f1f4f7;
+        border: 1px solid var(--line);
+      }
+
+      /* Search tree */
+
+      .tree-toolbar {
+        display: flex;
+        gap: 14px;
+        align-items: end;
+        flex-wrap: wrap;
+      }
+
+      .tree-toolbar label {
+        display: grid;
+        gap: 5px;
+        min-width: 210px;
+        max-width: 320px;
+        flex: 1;
+        font-size: 14px;
+        color: var(--mute);
+      }
+
+      .tree-legend {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin: 12px 0;
+        font-size: 12px;
+        color: var(--mute);
+      }
+
+      .tree-legend span:before {
+        content: "";
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        margin-right: 5px;
+        border: 2px solid var(--ink);
+        vertical-align: middle;
+      }
+
+      .legend-max:before {
+        border-color: var(--x) !important;
+      }
+
+      .legend-min:before {
+        border-color: var(--o) !important;
+      }
+
+      .legend-chance:before {
+        border-color: #d49a22 !important;
+      }
+
+      .tree-viewport {
+        width: 100%;
+        height: min(74vh, 850px);
+        min-height: 420px;
+        overflow: auto;
+        border: 1px solid var(--line);
+        background: #f3f6f8;
+        padding: 24px 18px;
+        position: relative;
+      }
+
+      .tree {
+        display: flex;
+        justify-content: center;
+        min-width: max-content;
+        position: relative;
+      }
+
+      .tree-edges {
+        position: absolute;
+        left: 0;
+        top: 0;
+        pointer-events: none;
+        overflow: visible;
+        z-index: 0;
+      }
+
+      .tree-branch {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        padding: 0 5px;
+        z-index: 1;
+      }
+
+      .tree-node-card {
+        width: 150px;
+        background: #fff;
+        border: 2px solid var(--ink);
+        padding: 7px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .tree-node-card.root {
+        border-color: var(--o);
+        border-width: 3px;
+      }
+
+      .tree-node-card.max {
+        border-top: 5px solid var(--x);
+      }
+
+      .tree-node-card.min {
+        border-top: 5px solid var(--o);
+      }
+
+      .tree-node-card.chance {
+        border-top: 5px solid #d49a22;
+      }
+
+      .tree-node-card.pruned {
+        border-style: dashed;
+        opacity: 0.62;
+        background: #f1f1f1;
+      }
+
+      .tree-node-card.terminal {
+        background: #fff7e5;
+      }
+
+      .tree-node-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+
+      .tree-node-sub {
+        font-size: 10px;
+        color: var(--mute);
+        line-height: 1.35;
+        margin-top: 5px;
+        min-height: 24px;
+      }
+
+      .tree-state {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        width: 72px;
+        height: 72px;
+        margin: 5px auto 3px;
+        border: 1px solid var(--ink);
+      }
+
+      .tree-state-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-right: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        font-size: 17px;
+        font-weight: 800;
+      }
+
+      .tree-state-cell:nth-child(3n) {
+        border-right: 0;
+      }
+
+      .tree-state-cell:nth-child(n + 7) {
+        border-bottom: 0;
+      }
+
+      .tree-state-cell.X {
+        color: var(--x);
+      }
+
+      .tree-state-cell.O {
+        color: var(--o);
+      }
+
+      .tree-state-cell.state-last {
+        background: rgba(242, 181, 68, 0.5);
+      }
+
+      .tree-children {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 7px;
+        position: relative;
+        padding-top: 38px;
+      }
+
+      .tree-meta {
+        margin: 10px 0;
+        font-size: 13px;
+        color: var(--mute);
+      }
+
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
         }
-    }
-    </style>
-</head>
 
-<body>
+        .wrap {
+          padding: 22px 14px 42px;
+        }
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        .cell {
+          transition: background 0.15s;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
     <div class="wrap">
+      <header>
         <h1>Adversarial Search</h1>
-        <p class="sub">Main Tic-Tac-Toe 3×3 melawan AI, lalu bandingkan lima
-            algoritma pada papan yang sama. Angka kecil di kotak adalah nilai yang
-            dihitung AI untuk langkah itu.</p>
+        <p class="sub">
+          Main Tic-Tac-Toe 3×3 melawan AI, lalu bandingkan lima algoritma pada
+          papan yang sama. Angka kecil di kotak adalah nilai yang dihitung AI
+          untuk langkah itu.
+        </p>
+      </header>
+
+      <nav class="nav">
+        <button class="tab active" data-page="play">01 · Play</button>
+        <button class="tab" data-page="tree">02 · Tree Visualizer</button>
+        <button class="tab" data-page="history">03 · Game History</button>
+      </nav>
+
+      <!-- PLAY -->
+
+      <section class="page active" id="page-play">
         <div class="grid">
-            <div>
-                <div class="card">
-                    <h2>Papan</h2>
-                    <div class="board"
-                        id="board"></div>
-                    <p id="status"></p>
-                    <div class="row"
-                        style="margin-top:0">
-                        <label>Yang jalan pertama<select id="starter">
-                                <option value="X">Anda (X)</option>
-                                <option value="O">AI (O)</option>
-                            </select></label>
-                        <button class="btn"
-                            id="new"
-                            style="align-self:end">Permainan
-                            baru</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <h2>Algoritma AI</h2>
-                    <div class="algo"
-                        id="algos"></div>
-                    <div class="row">
-                        <label>Batas kedalaman (DLS)<input id="limit"
-                                type="number"
-                                min="1"
-                                max="9"
-                                value="3"></label>
-                        <label>Jumlah simulasi (MCTS)<input id="sims"
-                                type="number"
-                                min="10"
-                                max="50000"
-                                value="1000"></label>
-                    </div>
-                </div>
+          <div>
+            <div class="card">
+              <h2>Papan</h2>
+
+              <div class="board" id="board"></div>
+
+              <p id="status"></p>
+
+              <div class="row" style="margin-top: 0">
+                <label>
+                  Mode permainan
+                  <select id="mode">
+                    <option value="human">Player vs AI</option>
+                    <option value="ai">AI vs AI</option>
+                  </select>
+                </label>
+
+                <label id="starterWrap">
+                  Yang jalan pertama
+                  <select id="starter">
+                    <option value="X">Player (X)</option>
+                    <option value="O">AI (O)</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="controls">
+                <button class="btn" id="new">Permainan baru</button>
+                <button class="btn alt" id="undo">↶ Undo</button>
+                <button class="btn alt" id="redo">↷ Redo</button>
+              </div>
             </div>
-            <div>
-                <div class="card">
-                    <h2 id="statsTitle">Analisis langkah AI</h2>
-                    <div id="stats">
-                        <p class="muted">Belum ada langkah AI. Jalankan satu giliran untuk
-                            melihat hasilnya.</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <h2>Matriks papan (input 2D)</h2>
-                    <textarea id="matrix"
-                        spellcheck="false"
-                        aria-label="Matriks papan"></textarea>
-                    <div class="row"
-                        style="margin-top:8px"><button class="btn alt"
-                            id="load">Terapkan matriks</button></div>
-                    <p id="err"></p>
-                </div>
-                <div class="card">
-                    <h2>Bandingkan semua algoritma</h2>
-                    <p class="muted"
-                        style="margin-bottom:12px">Menjalankan kelima
-                        algoritma pada papan saat ini untuk pemain yang sedang jalan. Coba
-                        pada papan kosong untuk melihat selisih jumlah node.</p>
-                    <button class="btn"
-                        id="cmp">Jalankan perbandingan</button>
-                    <div id="cmpOut"
-                        style="margin-top:12px"></div>
-                </div>
+
+            <div class="card" id="humanConfig">
+              <h2>Algoritma AI</h2>
+
+              <p class="muted" style="margin-bottom: 10px">
+                Pilih algoritma yang akan digunakan AI sebagai O. Player selalu
+                bermain sebagai X.
+              </p>
+
+              <div class="algo" id="algos"></div>
+
+              <div class="row">
+                <label id="limitWrap">
+                  Batas kedalaman (DLS)
+                  <input id="limit" type="number" min="1" max="9" value="3" />
+                </label>
+
+                <label id="simsWrap">
+                  Jumlah simulasi (MCTS)
+                  <input
+                    id="sims"
+                    type="number"
+                    min="10"
+                    max="50000"
+                    step="100"
+                    value="1000"
+                  />
+                </label>
+              </div>
+
+              <p class="field-note">
+                Pengaturan DLS dan MCTS hanya aktif jika algoritma terkait
+                dipilih.
+              </p>
             </div>
+
+            <div class="card" id="aiConfig" hidden>
+              <h2>Pengaturan AI vs AI</h2>
+
+              <p class="muted">
+                Tentukan algoritma untuk masing-masing pemain AI. Tidak ada
+                kontrol pemain manusia dalam mode ini.
+              </p>
+
+              <div class="row">
+                <label>
+                  Algoritma X
+                  <select id="algoX"></select>
+                </label>
+
+                <label>
+                  Algoritma O
+                  <select id="algoO"></select>
+                </label>
+              </div>
+
+              <div class="row">
+                <label id="aiLimitWrap">
+                  Batas kedalaman (DLS)
+                  <input id="aiLimit" type="number" min="1" max="9" value="3" />
+                </label>
+
+                <label id="aiSimsWrap">
+                  Jumlah simulasi (MCTS)
+                  <input
+                    id="aiSims"
+                    type="number"
+                    min="10"
+                    max="50000"
+                    step="100"
+                    value="1000"
+                  />
+                </label>
+              </div>
+
+              <div class="row">
+                <label>
+                  Yang jalan pertama
+                  <select id="aiStarter">
+                    <option value="X">AI X</option>
+                    <option value="O">AI O</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="controls">
+                <button class="btn" id="stepAI">Jalankan satu langkah</button>
+
+                <button class="btn" id="autoAI">▶ Jalankan AI vs AI</button>
+              </div>
+
+              <p class="field-note">
+                Pengaturan DLS/MCTS aktif jika salah satu AI menggunakan
+                algoritma tersebut.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <h2 id="statsTitle">Analisis langkah AI</h2>
+
+              <div id="stats">
+                <p class="muted">
+                  Belum ada langkah AI. Jalankan satu giliran untuk melihat
+                  hasilnya.
+                </p>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>Matriks papan (input 2D)</h2>
+
+              <textarea
+                id="matrix"
+                spellcheck="false"
+                aria-label="Matriks papan"
+              ></textarea>
+
+              <div class="row" style="margin-top: 8px">
+                <button class="btn alt" id="load">Terapkan matriks</button>
+              </div>
+
+              <p id="err"></p>
+            </div>
+
+            <div class="card">
+              <h2>Bandingkan semua algoritma</h2>
+
+              <p class="muted" style="margin-bottom: 12px">
+                Menjalankan kelima algoritma pada papan saat ini untuk pemain
+                yang sedang jalan. Coba pada papan kosong untuk melihat selisih
+                jumlah node.
+              </p>
+
+              <button class="btn" id="cmp">Jalankan perbandingan</button>
+
+              <div id="cmpOut" style="margin-top: 12px"></div>
+            </div>
+
+            <div class="card">
+              <h2>Replay pertandingan</h2>
+
+              <input
+                class="replay-range"
+                id="replayRange"
+                type="range"
+                min="0"
+                max="0"
+                value="0"
+              />
+
+              <div class="replay-meta">
+                <span class="muted" id="replayLabel">Langkah 0 / 0</span>
+
+                <div class="controls" style="margin: 0">
+                  <button class="btn alt" id="replayPrev">←</button>
+                  <button class="btn alt" id="replayPlay">▶ Play</button>
+                  <button class="btn alt" id="replayNext">→</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>Move Log</h2>
+
+              <div class="move-log" id="moveLog">
+                <div class="empty">Belum ada langkah.</div>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
+
+      <!-- SEARCH TREE -->
+
+      <section class="page" id="page-tree">
+        <div class="card">
+          <h2>Search Tree Visualization</h2>
+
+          <p class="muted">
+            Visualisasi pohon pencarian dari kondisi papan saat ini. Setiap node
+            menunjukkan matriks 3×3 setelah langkah yang dipilih, pemain
+            berikutnya, kedalaman, skor, dan status node.
+          </p>
+
+          <div class="tree-toolbar" style="margin-top: 14px">
+            <label>
+              Algoritma
+              <select id="treeAlgo"></select>
+            </label>
+
+            <button class="btn" id="buildTree">Build search tree</button>
+          </div>
+
+          <div class="tree-legend">
+            <span class="legend-max">MAX</span>
+            <span class="legend-min">MIN</span>
+            <span class="legend-chance">CHANCE</span>
+            <span>Garis putus-putus = cabang dipangkas/tidak dieksplorasi</span>
+          </div>
+
+          <div class="tree-meta" id="treeMeta">
+            Pilih algoritma lalu klik Build search tree.
+          </div>
+
+          <div class="tree-viewport">
+            <div id="treeView" class="tree">
+              <div class="empty">Search tree akan ditampilkan di sini.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GAME HISTORY -->
+
+      <section class="page" id="page-history">
+        <div class="card">
+          <div
+            class="row"
+            style="
+              justify-content: space-between;
+              align-items: center;
+              margin-top: 0;
+            "
+          >
+            <div>
+              <h2>Game History</h2>
+
+              <p class="muted">
+                Pertandingan yang sudah selesai disimpan di browser ini.
+              </p>
+            </div>
+
+            <button class="btn alt" id="clearHistory">Hapus riwayat</button>
+          </div>
+
+          <div class="history-list" id="historyList">
+            <div class="empty">Belum ada riwayat pertandingan.</div>
+          </div>
+        </div>
+      </section>
     </div>
+
     <script>
-    const $ = s => document.querySelector(s);
-    const NAMES = {
-        minimax: 'Minimax',
-        alphabeta: 'Alpha-Beta Pruning',
-        expectimax: 'Expectimax',
-        dls: 'Depth-Limited Search',
-        mcts: 'Monte Carlo Tree Search'
-    };
-    const DESC = {
-        minimax: 'Menelusuri seluruh pohon permainan; lawan dianggap bermain optimal.',
-        alphabeta: 'Hasil sama dengan Minimax, tetapi memangkas cabang yang tidak berpengaruh.',
-        expectimax: 'Lawan dianggap bermain acak, nilai langkahnya dirata-rata.',
-        dls: 'Minimax dengan batas kedalaman; di batas, papan dinilai dengan heuristik.',
-        mcts: 'Simulasi acak berulang untuk memperkirakan langkah terbaik.'
-    };
-    const LINES = [
+      const $ = (s) => document.querySelector(s);
+
+      const NAMES = {
+        minimax: "Minimax",
+        alphabeta: "Alpha-Beta Pruning",
+        expectimax: "Expectimax",
+        dls: "Depth-Limited Search",
+        mcts: "Monte Carlo Tree Search",
+      };
+
+      const DESC = {
+        minimax:
+          "Menelusuri seluruh pohon permainan; lawan dianggap bermain optimal.",
+        alphabeta:
+          "Hasil sama dengan Minimax, tetapi memangkas cabang yang tidak berpengaruh.",
+        expectimax:
+          "Lawan dianggap bermain acak, nilai langkahnya dirata-rata.",
+        dls: "Minimax dengan batas kedalaman; di batas, papan dinilai dengan heuristik.",
+        mcts: "Simulasi acak berulang untuk memperkirakan langkah terbaik.",
+      };
+
+      const LINES = [
         [0, 1, 2],
         [3, 4, 5],
         [6, 7, 8],
@@ -413,202 +980,1213 @@
         [1, 4, 7],
         [2, 5, 8],
         [0, 4, 8],
-        [2, 4, 6]
-    ];
-    let board, turn, starter = 'X',
-        over = false,
-        scores = {},
-        lastAI = null,
-        winLine = null;
+        [2, 4, 6],
+      ];
 
-    $('#algos').innerHTML = Object.keys(NAMES).map((k, i) =>
-        `<label><input type="radio" name="algo" value="${k}" ${i?'':'checked'} hidden><b>${NAMES[k]}</b><span>${DESC[k]}</span></label>`
-    ).join('');
-    const algo = () => $('input[name=algo]:checked').value;
-    const params = () => ({
-        algorithm: algo(),
-        limit: +$('#limit').value || 3,
-        sims: +$('#sims').value || 1000
-    });
-    async function api(path, body) {
-        const r = await fetch(path, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(body)
-        });
-        const j = await r.json();
-        if (!r.ok) throw new Error(j.error || 'Terjadi kesalahan');
-        return j
-    }
+      const HISTORY_KEY = "adversarial-tictactoe-history-v1";
 
-    function check() {
+      let board;
+      let turn;
+      let over = false;
+      let scores = {};
+      let lastAI = null;
+      let winLine = null;
+
+      let mode = "human";
+
+      let snapshots = [];
+      let cursor = 0;
+      let moveLog = [];
+
+      let gameSaved = false;
+      let lastAnalysis = null;
+
+      let autoRunning = false;
+      let aiBusy = false;
+      let replayTimer = null;
+      let gameToken = 0;
+
+      $("#algos").innerHTML = Object.keys(NAMES)
+        .map(
+          (k, i) => `
+    <label>
+        <input
+            type="radio"
+            name="algo"
+            value="${k}"
+            ${i ? "" : "checked"}>
+
+        <b>${NAMES[k]}</b>
+        <span>${DESC[k]}</span>
+    </label>
+`,
+        )
+        .join("");
+
+      for (const id of ["algoX", "algoO", "treeAlgo"]) {
+        $("#" + id).innerHTML = Object.entries(NAMES)
+          .map(([k, v]) => `<option value="${k}">${v}</option>`)
+          .join("");
+      }
+
+      $("#algoX").value = "alphabeta";
+      $("#algoO").value = "mcts";
+      $("#treeAlgo").value = "alphabeta";
+
+      /* ======================================================
+   HELPERS
+====================================================== */
+
+      const selectedAlgo = () => $('input[name="algo"]:checked').value;
+
+      const currentAlgoFor = (p) => {
+        if (mode === "human") {
+          return selectedAlgo();
+        }
+
+        return p === "X" ? $("#algoX").value : $("#algoO").value;
+      };
+
+      const currentLimit = () =>
+        +(mode === "human" ? $("#limit").value : $("#aiLimit").value) || 3;
+
+      const currentSims = () =>
+        +(mode === "human" ? $("#sims").value : $("#aiSims").value) || 1000;
+
+      const copy = (b) => b.map((r) => r.slice());
+
+      function check() {
         const f = board.flat();
+
         winLine = null;
+
         for (const l of LINES) {
-            const [a, b, c] = l;
-            if (f[a] && f[a] === f[b] && f[a] === f[c]) {
-                winLine = l;
-                return f[a]
-            }
+          const [a, b, c] = l;
+
+          if (f[a] && f[a] === f[b] && f[a] === f[c]) {
+            winLine = l;
+            return f[a];
+          }
         }
-        return f.includes('') ? null : 'draw'
-    }
 
-    function render() {
-        const el = $('#board');
-        el.innerHTML = '';
-        board.forEach((row, r) => row.forEach((v, c) => {
-            const b = document.createElement('button');
-            b.className = 'cell ' + v;
-            b.textContent = v;
-            if (winLine && winLine.includes(r * 3 + c)) b.classList.add(
-                'win');
-            if (lastAI && lastAI[0] === r && lastAI[1] === c) b.classList.add(
-                'pick');
-            const k = r + ',' + c;
-            if (k in scores) {
-                const s = document.createElement('span');
-                s.className = 'sc';
-                s.textContent = scores[k];
-                b.append(s)
-            }
-            b.disabled = over || turn !== 'X' || !!v;
-            b.setAttribute('aria-label',
-                `Baris ${r+1}, kolom ${c+1}: ${v||'kosong'}`);
-            b.onclick = () => humanMove(r, c);
-            el.append(b)
-        }));
-        const w = check();
-        $('#status').textContent = w === 'draw' ? 'Seri.' : w ? (w === 'X' ?
-                'Anda menang.' : 'AI menang.') : turn === 'X' ? 'Giliran Anda (X).' :
-            'AI sedang berpikir…';
-        $('#matrix').value = board.map(r => JSON.stringify(r)).join(',\n');
-    }
+        return f.includes("") ? null : "draw";
+      }
 
-    function settle() {
-        over = !!check();
+      async function api(path, body) {
+        const r = await fetch(path, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+
+        const j = await r.json();
+
+        if (!r.ok) {
+          throw Error(j.error || "Terjadi kesalahan");
+        }
+
+        return j;
+      }
+
+      function moveParams(p, algorithm) {
+        return {
+          algorithm,
+          limit: currentLimit(),
+          sims: currentSims(),
+          board: copy(board),
+          player: p,
+        };
+      }
+
+      function saveSnapshot() {
+        snapshots = snapshots.slice(0, cursor + 1);
+
+        snapshots.push({
+          board: copy(board),
+          turn,
+          over,
+          scores: { ...scores },
+          lastAI: lastAI ? lastAI.slice() : null,
+          winLine: winLine ? winLine.slice() : null,
+          moveLog: moveLog.slice(),
+          lastAnalysis: lastAnalysis
+            ? JSON.parse(JSON.stringify(lastAnalysis))
+            : null,
+        });
+
+        cursor = snapshots.length - 1;
+
+        updateReplay();
+      }
+
+      function restoreSnapshot(i) {
+        if (i < 0 || i >= snapshots.length) return;
+
+        cursor = i;
+
+        const s = snapshots[i];
+
+        board = copy(s.board);
+        turn = s.turn;
+        over = s.over;
+        scores = { ...s.scores };
+        lastAI = s.lastAI ? s.lastAI.slice() : null;
+        winLine = s.winLine ? s.winLine.slice() : null;
+        moveLog = s.moveLog.slice();
+
+        lastAnalysis = s.lastAnalysis
+          ? JSON.parse(JSON.stringify(s.lastAnalysis))
+          : null;
+
         render();
-        if (!over && turn === 'O') aiMove()
-    }
+        renderStats();
+        updateReplay();
+      }
 
-    function humanMove(r, c) {
-        board[r][c] = 'X';
-        turn = 'O';
-        scores = {};
-        lastAI = null;
-        settle()
-    }
+      function render() {
+        const el = $("#board");
 
-    function show(res, title) {
-        $('#statsTitle').textContent = 'Analisis langkah AI: ' + title;
-        $('#stats').innerHTML =
-            `<div><b>${res.move?`Baris ${res.move[0]+1}, kolom ${res.move[1]+1}`:'-'}</b><span>Langkah terpilih</span></div>
-<div><b>${res.nodes.toLocaleString('id-ID')}</b><span>Node dieksplorasi</span></div><div><b>${res.time_ms} ms</b><span>Waktu</span></div>`
-    }
+        el.innerHTML = "";
 
-    async function aiMove() {
-        try {
-            const res = await api('/api/move', {
-                ...params(),
-                board,
-                player: 'O'
-            });
-            show(res, NAMES[algo()]);
-            if (res.move) {
-                board[res.move[0]][res.move[1]] = 'O';
-                lastAI = res.move;
-                scores = res.scores
+        board.forEach((row, r) => {
+          row.forEach((v, c) => {
+            const b = document.createElement("button");
+
+            b.className = "cell " + v;
+            b.textContent = v;
+
+            if (winLine && winLine.includes(r * 3 + c)) {
+              b.classList.add("win");
             }
-            turn = 'X';
-            settle()
-        } catch (e) {
-            $('#status').textContent = 'Gagal: ' + e.message +
-                '. Pastikan server.py berjalan.'
-        }
-    }
 
-    function newGame() {
-        starter = $('#starter').value;
-        board = [
-            ['', '', ''],
-            ['', '', ''],
-            ['', '', '']
+            if (lastAI && lastAI[0] === r && lastAI[1] === c) {
+              b.classList.add("pick");
+            }
+
+            const k = r + "," + c;
+
+            if (k in scores) {
+              const s = document.createElement("span");
+              s.className = "sc";
+              s.textContent = scores[k];
+              b.append(s);
+            }
+
+            const humanCanPlay =
+              mode === "human" &&
+              turn === "X" &&
+              !over &&
+              !aiBusy &&
+              cursor === snapshots.length - 1;
+
+            b.disabled = over || !!v || !humanCanPlay;
+
+            b.setAttribute(
+              "aria-label",
+              `Baris ${r + 1}, kolom ${c + 1}: ${v || "kosong"}`,
+            );
+
+            b.onclick = () => humanMove(r, c);
+
+            el.append(b);
+          });
+        });
+
+        const w = check();
+
+        over = !!w;
+
+        if (w === "draw") {
+          $("#status").textContent = "Seri.";
+        } else if (w) {
+          $("#status").textContent =
+            w === "X"
+              ? mode === "human"
+                ? "Anda menang."
+                : "AI X menang."
+              : "AI O menang.";
+        } else if (mode === "human") {
+          $("#status").textContent =
+            turn === "X" ? "Giliran Anda (X)." : "AI sedang berpikir…";
+        } else {
+          $("#status").textContent =
+            `Giliran AI ${turn} (${NAMES[currentAlgoFor(turn)]}).`;
+        }
+
+        $("#matrix").value = board.map((r) => JSON.stringify(r)).join(",\n");
+
+        $("#undo").disabled = cursor <= 0 || aiBusy;
+        $("#redo").disabled = cursor >= snapshots.length - 1 || aiBusy;
+
+        $("#stepAI").disabled = mode !== "ai" || over || aiBusy || autoRunning;
+
+        $("#autoAI").disabled =
+          mode !== "ai" || over || (aiBusy && !autoRunning);
+
+        $("#autoAI").textContent = autoRunning
+          ? "■ Stop AI vs AI"
+          : "▶ Jalankan AI vs AI";
+
+        if (w) {
+          saveFinishedGame();
+        }
+      }
+
+      function renderStats() {
+        if (!lastAnalysis) {
+          $("#statsTitle").textContent = "Analisis langkah AI";
+
+          $("#stats").innerHTML = `
+            <p class="muted">
+                Belum ada langkah AI. Jalankan satu giliran untuk
+                melihat hasilnya.
+            </p>
+        `;
+
+          return;
+        }
+
+        const r = lastAnalysis;
+
+        $("#statsTitle").textContent =
+          "Analisis langkah AI: " + (NAMES[r.algorithm] || r.algorithm);
+
+        $("#stats").innerHTML = `
+        <div>
+            <b>
+                ${
+                  r.move
+                    ? `Baris ${r.move[0] + 1}, kolom ${r.move[1] + 1}`
+                    : "-"
+                }
+            </b>
+            <span>Langkah terpilih (${r.player})</span>
+        </div>
+
+        <div>
+            <b>${Number(r.nodes).toLocaleString("id-ID")}</b>
+            <span>Node dieksplorasi</span>
+        </div>
+
+        <div>
+            <b>${r.time_ms} ms</b>
+            <span>Waktu</span>
+        </div>
+    `;
+      }
+
+      function renderMoveLog() {
+        $("#moveLog").innerHTML = moveLog.length
+          ? moveLog
+              .map(
+                (m, i) => `
+            <div class="move-item">
+                <span>
+                    <b>${i + 1}.</b>
+                    <strong class="${m.player === "X" ? "x" : "o"}">
+                        ${m.player}
+                    </strong>
+                    → baris ${m.row}, kolom ${m.col}
+                </span>
+
+                <small>${m.source}</small>
+            </div>
+        `,
+              )
+              .join("")
+          : '<div class="empty">Belum ada langkah.</div>';
+      }
+
+      function updateReplay() {
+        $("#replayRange").max = Math.max(0, snapshots.length - 1);
+        $("#replayRange").value = cursor;
+
+        $("#replayLabel").textContent =
+          `Langkah ${cursor} / ${Math.max(0, snapshots.length - 1)}`;
+
+        renderMoveLog();
+      }
+
+      function stopReplay() {
+        if (replayTimer) {
+          clearInterval(replayTimer);
+          replayTimer = null;
+        }
+
+        $("#replayPlay").textContent = "▶ Play";
+      }
+
+      function switchPage(name) {
+        document.querySelectorAll(".tab").forEach((b) => {
+          b.classList.toggle("active", b.dataset.page === name);
+        });
+
+        document.querySelectorAll(".page").forEach((p) => {
+          p.classList.toggle("active", p.id === "page-" + name);
+        });
+
+        if (name === "history") {
+          renderHistory();
+        }
+
+        if (name === "tree") {
+          requestAnimationFrame(drawTreeEdges);
+        }
+      }
+
+      document.querySelectorAll(".tab").forEach((b) => {
+        b.onclick = () => switchPage(b.dataset.page);
+      });
+
+      function updateModeUI() {
+        mode = $("#mode").value;
+
+        $("#humanConfig").hidden = mode !== "human";
+        $("#aiConfig").hidden = mode !== "ai";
+
+        $("#starterWrap").innerHTML =
+          mode === "human"
+            ? `
+            <label>
+                Yang jalan pertama
+                <select id="starter">
+                    <option value="X">Player (X)</option>
+                    <option value="O">AI (O)</option>
+                </select>
+            </label>
+        `
+            : `
+            <label>
+                Yang jalan pertama
+                <select id="starter">
+                    <option value="X">AI X</option>
+                    <option value="O">AI O</option>
+                </select>
+            </label>
+        `;
+
+        $("#starter").value = "X";
+
+        updateParameterAvailability();
+      }
+
+      function updateParameterAvailability() {
+        const human = mode === "human";
+
+        const algos = human
+          ? [selectedAlgo()]
+          : [$("#algoX").value, $("#algoO").value];
+
+        const needDls = algos.includes("dls");
+        const needMcts = algos.includes("mcts");
+
+        const settings = [
+          ["limitWrap", "#limit", human && needDls],
+          ["simsWrap", "#sims", human && needMcts],
+          ["aiLimitWrap", "#aiLimit", !human && needDls],
+          ["aiSimsWrap", "#aiSims", !human && needMcts],
         ];
-        turn = starter;
+
+        for (const [wrap, input, active] of settings) {
+          $("#" + wrap).classList.toggle("disabled-field", !active);
+          $(input).disabled = !active;
+        }
+      }
+
+      function newGame() {
+        gameToken++;
+
+        stopReplay();
+
+        autoRunning = false;
+        aiBusy = false;
+
+        mode = $("#mode").value;
+
+        board = [
+          ["", "", ""],
+          ["", "", ""],
+          ["", "", ""],
+        ];
+
+        turn = $("#starter").value;
+
+        over = false;
         scores = {};
         lastAI = null;
-        $('#err').textContent = '';
-        settle()
-    }
+        winLine = null;
 
-    $('#new').onclick = newGame;
-    $('#load').onclick = () => {
-        try {
-            const t = $('#matrix').value.trim();
-            let m;
-            try {
-                m = JSON.parse('[' + t + ']')
-            } catch {
-                m = JSON.parse(t)
-            }
-            if (m.length === 1 && Array.isArray(m[0]) && Array.isArray(m[0][0])) m = m[0];
-            m = m.map(r => r.map(c => String(c || '').trim().toUpperCase()));
-            if (m.length !== 3 || m.some(r => r.length !== 3 || r.some(c => !['',
-                    'X', 'O'
-                ].includes(c)))) throw 0;
-            board = m;
-            scores = {};
-            lastAI = null;
-            $('#err').textContent = '';
-            const f = m.flat(),
-                x = f.filter(v => v === 'X').length,
-                o = f.filter(v => v === 'O').length;
-            starter = $('#starter').value;
-            turn = x > o ? 'O' : o > x ? 'X' : starter;
-            settle()
-        } catch {
-            $('#err').textContent =
-                'Format tidak valid. Gunakan matriks 3×3 berisi "X", "O", atau "".'
-        }
-    };
+        moveLog = [];
+        lastAnalysis = null;
 
-    $('#cmp').onclick = async () => {
-        const out = $('#cmpOut'),
-            btn = $('#cmp');
-        if (over) {
-            out.innerHTML =
-                '<p class="muted">Permainan sudah selesai. Mulai permainan baru atau muat matriks lain.</p>';
-            return
+        gameSaved = false;
+
+        snapshots = [];
+        cursor = -1;
+
+        $("#err").textContent = "";
+        $("#cmpOut").innerHTML = "";
+
+        $("#treeView").innerHTML = `
+        <div class="empty">
+            Pilih algoritma lalu klik Build search tree.
+        </div>
+    `;
+
+        $("#treeMeta").textContent =
+          "Pilih algoritma lalu klik Build search tree.";
+
+        saveSnapshot();
+
+        render();
+        renderStats();
+
+        // Player vs AI: jika AI O mendapat giliran pertama,
+        // AI langsung menjalankan langkahnya.
+        if (mode === "human" && turn === "O") {
+          runAiMove();
         }
-        btn.disabled = true;
-        btn.textContent = 'Menghitung…';
+      }
+
+      function recordMove(p, move, source) {
+        moveLog.push({
+          player: p,
+          row: move[0] + 1,
+          col: move[1] + 1,
+          source,
+        });
+
+        turn = p === "X" ? "O" : "X";
+      }
+
+      function humanMove(r, c) {
+        if (mode !== "human" || turn !== "X" || over || aiBusy || board[r][c]) {
+          return;
+        }
+
+        board[r][c] = "X";
+
+        scores = {};
+        lastAI = null;
+
+        recordMove("X", [r, c], "Player");
+
+        const w = check();
+        over = !!w;
+
+        saveSnapshot();
+        render();
+
+        if (!over) {
+          runAiMove();
+        }
+      }
+
+      async function runAiMove() {
+        if (over || aiBusy) return;
+
+        const token = gameToken;
+        const p = turn;
+        const algorithm = currentAlgoFor(p);
+
+        aiBusy = true;
+        render();
+
         try {
-            const r = await api('/api/compare', {
-                ...params(),
-                board,
-                player: turn
-            });
-            const mx = Math.max(...Object.values(r).map(x => x.nodes));
-            out.innerHTML =
-                `<p class="muted" style="margin-bottom:8px">Pemain yang jalan: ${turn}</p><table><thead><tr><th>Algoritma</th><th>Langkah</th><th>Node</th><th>Waktu (ms)</th></tr></thead><tbody>` +
-                Object.keys(NAMES).map(k => {
-                    const x = r[k],
-                        w = mx > 1 ? 100 * Math.log10(x.nodes + 1) / Math.log10(mx +
-                            1) : 0;
-                    return `<tr><td>${NAMES[k]}</td><td>${x.move?`(${x.move[0]+1}, ${x.move[1]+1})`:'-'}</td><td class="bar">${x.nodes.toLocaleString('id-ID')}<i style="width:${w}%"></i></td><td>${x.time_ms}</td></tr>`
-                }).join('') +
-                `</tbody></table><p class="muted" style="margin-top:8px">Langkah dalam (baris, kolom). Panjang garis di kolom node memakai skala log.</p>`
+          const res = await api("/api/move", moveParams(p, algorithm));
+
+          if (token !== gameToken) return;
+
+          lastAnalysis = {
+            ...res,
+            algorithm,
+            player: p,
+          };
+
+          if (res.move) {
+            board[res.move[0]][res.move[1]] = p;
+
+            lastAI = res.move.slice();
+            scores = res.scores || {};
+
+            recordMove(
+              p,
+              res.move,
+              mode === "human"
+                ? "AI · " + NAMES[algorithm]
+                : "AI · " + NAMES[algorithm],
+            );
+          }
+
+          const w = check();
+          over = !!w;
+
+          saveSnapshot();
+
+          render();
+          renderStats();
         } catch (e) {
-            out.innerHTML = `<p id="err">${e.message}</p>`
+          if (token === gameToken) {
+            $("#status").textContent =
+              "Gagal: " + e.message + ". Pastikan server.py berjalan.";
+          }
+        } finally {
+          if (token === gameToken) {
+            aiBusy = false;
+            render();
+          }
         }
+      }
+
+      async function aiStep() {
+        if (mode !== "ai" || over || aiBusy) return;
+
+        const token = gameToken;
+        const p = turn;
+        const algorithm = currentAlgoFor(p);
+
+        aiBusy = true;
+        render();
+
+        try {
+          const res = await api("/api/move", moveParams(p, algorithm));
+
+          if (token !== gameToken) return;
+
+          lastAnalysis = {
+            ...res,
+            algorithm,
+            player: p,
+          };
+
+          if (res.move) {
+            board[res.move[0]][res.move[1]] = p;
+
+            lastAI = res.move.slice();
+            scores = res.scores || {};
+
+            recordMove(p, res.move, "AI · " + NAMES[algorithm]);
+          }
+
+          over = !!check();
+
+          saveSnapshot();
+
+          render();
+          renderStats();
+        } catch (e) {
+          if (token === gameToken) {
+            $("#status").textContent = "AI gagal: " + e.message;
+          }
+
+          throw e;
+        } finally {
+          if (token === gameToken) {
+            aiBusy = false;
+            render();
+          }
+        }
+      }
+
+      async function runAuto() {
+        if (mode !== "ai" || over) return;
+
+        if (autoRunning) {
+          autoRunning = false;
+          render();
+          return;
+        }
+
+        autoRunning = true;
+        render();
+
+        try {
+          while (autoRunning && !over) {
+            await aiStep();
+
+            if (autoRunning && !over) {
+              await new Promise((r) => setTimeout(r, 350));
+            }
+          }
+        } catch {}
+
+        autoRunning = false;
+        render();
+      }
+
+      function saveFinishedGame() {
+        if (gameSaved) return;
+
+        gameSaved = true;
+
+        const w = check();
+
+        const entry = {
+          id: Date.now(),
+          date: new Date().toISOString(),
+          mode,
+          winner: w,
+          moves: moveLog.slice(),
+
+          algoHuman: selectedAlgo(),
+          algoX: $("#algoX").value,
+          algoO: $("#algoO").value,
+
+          snapshots: snapshots.map((s) => ({
+            board: s.board,
+            turn: s.turn,
+            over: s.over,
+            scores: s.scores,
+            lastAI: s.lastAI,
+            winLine: s.winLine,
+            moveLog: s.moveLog,
+            lastAnalysis: s.lastAnalysis,
+          })),
+        };
+
+        const all = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+
+        all.unshift(entry);
+
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(all.slice(0, 50)));
+
+        renderHistory();
+      }
+
+      function renderHistory() {
+        const all = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+
+        $("#historyList").innerHTML = all.length
+          ? all
+              .map(
+                (g) => `
+            <div class="history-item">
+
+                <div>
+                    <b>
+                        ${g.winner === "draw" ? "Seri" : g.winner + " menang"}
+                    </b>
+
+                    <div class="muted">
+                        ${new Date(g.date).toLocaleString("id-ID")}
+                        · ${g.moves.length} langkah
+                        · ${g.mode === "ai" ? "AI vs AI" : "Player vs AI"}
+                    </div>
+
+                    <div class="muted">
+                        ${
+                          g.mode === "ai"
+                            ? `X: ${NAMES[g.algoX]} · O: ${NAMES[g.algoO]}`
+                            : `AI: ${NAMES[g.algoHuman]}`
+                        }
+                    </div>
+                </div>
+
+                <button class="btn" data-review="${g.id}">
+                    Review
+                </button>
+
+            </div>
+        `,
+              )
+              .join("")
+          : '<div class="empty">Belum ada pertandingan selesai.</div>';
+
+        $("#historyList")
+          .querySelectorAll("[data-review]")
+          .forEach((b) => {
+            b.onclick = () => reviewGame(+b.dataset.review);
+          });
+      }
+
+      function reviewGame(id) {
+        const g = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]").find(
+          (x) => x.id === id,
+        );
+
+        if (!g) return;
+
+        gameToken++;
+
+        stopReplay();
+
+        autoRunning = false;
+        aiBusy = false;
+
+        mode = g.mode;
+
+        $("#mode").value = mode;
+
+        updateModeUI();
+
+        if (mode === "ai") {
+          $("#algoX").value = g.algoX;
+          $("#algoO").value = g.algoO;
+        } else {
+          const radio = $(`input[name="algo"][value="${g.algoHuman}"]`);
+
+          if (radio) {
+            radio.checked = true;
+          }
+        }
+
+        snapshots = g.snapshots.map((s) => ({
+          ...s,
+          board: copy(s.board),
+          scores: { ...s.scores },
+          moveLog: s.moveLog.slice(),
+          lastAI: s.lastAI ? s.lastAI.slice() : null,
+          lastAnalysis: s.lastAnalysis
+            ? JSON.parse(JSON.stringify(s.lastAnalysis))
+            : null,
+        }));
+
+        if (!snapshots.length) return;
+
+        cursor = 0;
+        gameSaved = true;
+
+        restoreSnapshot(0);
+
+        switchPage("play");
+        updateParameterAvailability();
+      }
+
+      $("#mode").onchange = () => {
+        updateModeUI();
+        newGame();
+      };
+
+      $("#starter").onchange = newGame;
+
+      $("#algos").addEventListener("change", updateParameterAvailability);
+
+      for (const id of ["algoX", "algoO"]) {
+        $("#" + id).onchange = updateParameterAvailability;
+      }
+
+      $("#new").onclick = newGame;
+
+      $("#undo").onclick = () => {
+        stopReplay();
+
+        if (cursor > 0) {
+          restoreSnapshot(cursor - 1);
+        }
+      };
+
+      $("#redo").onclick = () => {
+        stopReplay();
+
+        if (cursor < snapshots.length - 1) {
+          restoreSnapshot(cursor + 1);
+        }
+      };
+
+      $("#stepAI").onclick = aiStep;
+      $("#autoAI").onclick = runAuto;
+
+      $("#replayRange").oninput = (e) => {
+        stopReplay();
+        restoreSnapshot(+e.target.value);
+      };
+
+      $("#replayPrev").onclick = () => {
+        restoreSnapshot(Math.max(0, cursor - 1));
+      };
+
+      $("#replayNext").onclick = () => {
+        restoreSnapshot(Math.min(snapshots.length - 1, cursor + 1));
+      };
+
+      $("#replayPlay").onclick = () => {
+        if (replayTimer) {
+          stopReplay();
+          return;
+        }
+
+        if (cursor >= snapshots.length - 1) {
+          restoreSnapshot(0);
+        }
+
+        $("#replayPlay").textContent = "Ⅱ Pause";
+
+        replayTimer = setInterval(() => {
+          if (cursor >= snapshots.length - 1) {
+            stopReplay();
+            return;
+          }
+
+          restoreSnapshot(cursor + 1);
+        }, 650);
+      };
+
+      $("#load").onclick = () => {
+        try {
+          const t = $("#matrix").value.trim();
+
+          let m;
+
+          try {
+            m = JSON.parse("[" + t + "]");
+          } catch {
+            m = JSON.parse(t);
+          }
+
+          if (m.length === 1 && Array.isArray(m[0]) && Array.isArray(m[0][0])) {
+            m = m[0];
+          }
+
+          m = m.map((r) =>
+            r.map((c) =>
+              String(c || "")
+                .trim()
+                .toUpperCase(),
+            ),
+          );
+
+          if (
+            m.length !== 3 ||
+            m.some(
+              (r) =>
+                r.length !== 3 || r.some((c) => !["", "X", "O"].includes(c)),
+            )
+          ) {
+            throw Error();
+          }
+
+          const f = m.flat();
+
+          const x = f.filter((v) => v === "X").length;
+          const o = f.filter((v) => v === "O").length;
+
+          if (Math.abs(x - o) > 1) {
+            throw Error();
+          }
+
+          board = m;
+
+          const starter = $("#starter").value;
+
+          turn = x > o ? "O" : o > x ? "X" : starter;
+
+          scores = {};
+          lastAI = null;
+          lastAnalysis = null;
+          moveLog = [];
+
+          over = !!check();
+
+          snapshots = [];
+          cursor = -1;
+          gameSaved = false;
+
+          saveSnapshot();
+
+          $("#err").textContent = "";
+
+          render();
+          renderStats();
+
+          if (!over && mode === "human" && turn === "O") {
+            runAiMove();
+          }
+        } catch {
+          $("#err").textContent =
+            'Format tidak valid. Gunakan matriks 3×3 berisi "X", "O", atau "" dengan jumlah X/O yang masuk akal.';
+        }
+      };
+
+      $("#cmp").onclick = async () => {
+        const out = $("#cmpOut");
+        const btn = $("#cmp");
+
+        if (over) {
+          out.innerHTML = `
+            <p class="muted">
+                Permainan sudah selesai. Mulai permainan baru
+                atau muat matriks lain.
+            </p>
+        `;
+
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Menghitung…";
+
+        try {
+          const p = turn;
+
+          const r = await api("/api/compare", {
+            limit: currentLimit(),
+            sims: currentSims(),
+            board: copy(board),
+            player: p,
+          });
+
+          const mx = Math.max(...Object.values(r).map((x) => x.nodes));
+
+          out.innerHTML = `
+            <p class="muted" style="margin-bottom:8px">
+                Pemain yang jalan: ${p}
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algoritma</th>
+                        <th>Langkah</th>
+                        <th>Node</th>
+                        <th>Waktu (ms)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    ${Object.keys(NAMES)
+                      .map((k) => {
+                        const x = r[k];
+
+                        const w =
+                          mx > 1
+                            ? (100 * Math.log10(x.nodes + 1)) /
+                              Math.log10(mx + 1)
+                            : 0;
+
+                        return `
+                                <tr>
+                                    <td>${NAMES[k]}</td>
+
+                                    <td>
+                                        ${
+                                          x.move
+                                            ? `(${x.move[0] + 1}, ${x.move[1] + 1})`
+                                            : "-"
+                                        }
+                                    </td>
+
+                                    <td class="bar">
+                                        ${x.nodes.toLocaleString("id-ID")}
+                                        <i style="width:${w}%"></i>
+                                    </td>
+
+                                    <td>${x.time_ms}</td>
+                                </tr>
+                            `;
+                      })
+                      .join("")}
+                </tbody>
+            </table>
+
+            <p class="muted" style="margin-top:8px">
+                Langkah dalam (baris, kolom). Panjang garis di
+                kolom node memakai skala log.
+            </p>
+        `;
+        } catch (e) {
+          out.innerHTML = `<p id="err">${e.message}</p>`;
+        }
+
         btn.disabled = false;
-        btn.textContent = 'Jalankan perbandingan'
-    };
+        btn.textContent = "Jalankan perbandingan";
+      };
 
-    newGame();
+      function renderTreeNode(n) {
+        const move = n.move ? `(${n.move[0] + 1}, ${n.move[1] + 1})` : "ROOT";
+
+        const k = (n.kind || "").toLowerCase();
+
+        const cls = [
+          "tree-node-card",
+          k.includes("max") ? "max" : "",
+          k.includes("min") ? "min" : "",
+          k.includes("chance") ? "chance" : "",
+          n.pruned ? "pruned" : "",
+          n.terminal ? "terminal" : "",
+          n.depth === 0 ? "root" : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        const cells = (
+          n.state || [
+            ["", "", ""],
+            ["", "", ""],
+            ["", "", ""],
+          ]
+        )
+          .flat()
+          .map(
+            (v, i) => `
+            <span class="tree-state-cell ${v} ${
+              n.move && n.move[0] * 3 + n.move[1] === i ? "state-last" : ""
+            }">
+                ${v || "·"}
+            </span>
+        `,
+          )
+          .join("");
+
+        const score = n.score === undefined || n.score === null ? "—" : n.score;
+
+        const label = n.label || (n.pruned ? "Tidak dieksplorasi" : "");
+
+        const kids = n.children || [];
+
+        return `
+        <div class="tree-branch">
+
+            <article class="${cls}">
+
+                <div class="tree-node-head">
+                    <span>${n.kind || "NODE"}</span>
+                    <span>${move}</span>
+                </div>
+
+                <div class="tree-state">
+                    ${cells}
+                </div>
+
+                <div class="tree-node-sub">
+                    ${n.player ? "Giliran " + n.player + " · " : ""}
+                    Depth ${n.depth ?? "—"}
+                    · Score ${score}
+                    <br>
+                    ${label}
+                </div>
+
+            </article>
+
+            ${
+              kids.length
+                ? `
+                        <div class="tree-children">
+                            ${kids.map(renderTreeNode).join("")}
+                        </div>
+                    `
+                : ""
+            }
+
+        </div>
+    `;
+      }
+
+      function drawTreeEdges() {
+        const tree = $("#treeView");
+
+        if (!tree.querySelector(".tree-node-card")) {
+          return;
+        }
+
+        tree.querySelector(".tree-edges")?.remove();
+
+        const rect = tree.getBoundingClientRect();
+
+        const width = Math.max(tree.scrollWidth, rect.width);
+        const height = Math.max(tree.scrollHeight, rect.height);
+
+        const svg = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "svg",
+        );
+
+        svg.setAttribute("class", "tree-edges");
+        svg.setAttribute("width", width);
+        svg.setAttribute("height", height);
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+        tree.querySelectorAll(".tree-branch").forEach((branch) => {
+          const parent = branch.querySelector(":scope > .tree-node-card");
+
+          const children = branch.querySelector(":scope > .tree-children");
+
+          if (!parent || !children) return;
+
+          const p = parent.getBoundingClientRect();
+
+          children.querySelectorAll(":scope > .tree-branch").forEach((ch) => {
+            const card = ch.querySelector(":scope > .tree-node-card");
+
+            if (!card) return;
+
+            const c = card.getBoundingClientRect();
+
+            const x1 = p.left + p.width / 2 - rect.left;
+            const y1 = p.bottom - rect.top;
+
+            const x2 = c.left + c.width / 2 - rect.left;
+            const y2 = c.top - rect.top;
+
+            const mid = y1 + (y2 - y1) * 0.5;
+
+            const path = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "path",
+            );
+
+            path.setAttribute("d", `M${x1} ${y1} V${mid} H${x2} V${y2}`);
+
+            path.setAttribute("fill", "none");
+            path.setAttribute("stroke", "#AEBBC8");
+            path.setAttribute("stroke-width", "1.6");
+
+            svg.append(path);
+          });
+        });
+
+        tree.insertBefore(svg, tree.firstChild);
+      }
+
+      $("#buildTree").onclick = async () => {
+        const btn = $("#buildTree");
+
+        btn.disabled = true;
+        btn.textContent = "Building…";
+
+        try {
+          const a = $("#treeAlgo").value;
+
+          const r = await api("/api/tree", {
+            board: copy(board),
+            player: turn,
+            turn,
+            algorithm: a,
+            limit: currentLimit(),
+            sims: currentSims(),
+            max_nodes: 260,
+          });
+
+          $("#treeMeta").textContent =
+            `${NAMES[a]} · ${r.nodes} node ditampilkan · ` +
+            `${r.pruned} cabang dipangkas/tidak dieksplorasi. ` +
+            `${r.note || ""}`;
+
+          $("#treeView").innerHTML = renderTreeNode(r.tree);
+
+          requestAnimationFrame(drawTreeEdges);
+        } catch (e) {
+          $("#treeView").innerHTML = `
+            <div class="empty">
+                Gagal membangun tree: ${e.message}
+            </div>
+        `;
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Build search tree";
+        }
+      };
+
+      $("#clearHistory").onclick = () => {
+        if (confirm("Hapus seluruh riwayat pertandingan?")) {
+          localStorage.removeItem(HISTORY_KEY);
+          renderHistory();
+        }
+      };
+
+      updateModeUI();
+      newGame();
     </script>
-</body>
-
+  </body>
 </html>
