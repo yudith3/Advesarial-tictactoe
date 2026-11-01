@@ -16,10 +16,9 @@ Seluruh algoritma ditulis dengan Python murni (tanpa library tambahan). Antarmuk
 6. [Penjelasan Kelima Algoritma](#penjelasan-kelima-algoritma)
 7. [Cara Membaca Hasil Analisis](#cara-membaca-hasil-analisis)
 8. [Dokumentasi API](#dokumentasi-api)
-9. [Deploy ke Vercel](#deploy-ke-vercel)
-10. [Menambah Algoritma Baru](#menambah-algoritma-baru)
-11. [Batasan dan Catatan](#batasan-dan-catatan)
-12. [Referensi](#referensi)
+9. [Menambah Algoritma Baru](#menambah-algoritma-baru)
+10. [Batasan dan Catatan](#batasan-dan-catatan)
+11. [Referensi](#referensi)
 
 ---
 
@@ -57,8 +56,6 @@ Seluruh algoritma ditulis dengan Python murni (tanpa library tambahan). Antarmuk
 └── README.md
 ```
 
-Catatan: `api/`, `core.py` hanya diperlukan untuk deploy ke Vercel. Untuk menjalankan di lokal, yang dipakai adalah `local_server.py`, `algorithms/`, dan `public/`.
-
 ---
 
 ## Cara Menjalankan di Komputer Lokal
@@ -81,8 +78,6 @@ Lalu buka `http://localhost:8000` di browser (atau port yang Anda pilih).
 Untuk menghentikan server, tekan `Ctrl + C` di terminal.
 
 **Jika halaman tidak berubah setelah Anda mengedit `index.html`,** muat ulang dengan `Ctrl + F5` agar cache browser dibersihkan.
-
-**Catatan font:** antarmuka memakai font Bricolage Grotesque dari Google Fonts. Jika komputer Anda tidak tersambung internet, tampilan otomatis memakai font bawaan sistem dan tetap berfungsi normal.
 
 ---
 
